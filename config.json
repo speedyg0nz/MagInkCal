@@ -1,0 +1,15 @@
+{
+  "displayTZ": "Asia/Hong_Kong",
+  "thresholdHours": 24,
+  "maxEventsPerDay": 3,
+  "isDisplayToScreen": false,
+  "isShutdownOnComplete": false,
+  "batteryDisplayMode": 1,
+  "weekStartDay": 6,
+  "dayOfWeekText": ["M", "T", "W", "T", "F", "S", "S"],
+  "screenWidth": 1304,
+  "screenHeight": 984,
+  "imageWidth": 984,
+  "imageHeight": 1304,
+  "rotateAngle": 270
+}
