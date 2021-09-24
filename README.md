@@ -51,7 +51,7 @@ curl http://cdn.pisugar.com/release/Pisugar-power-manager.sh | sudo bash
 
 6. Download the over the files in this repo to a folder in your PC first. 
 
-7. In order for you to access your Google Calendar events, it's necessary to first grant the access. Follow the instructions here to get the credentials.json file from your Google API. Don't worry, take your time. I'll be waiting here.
+7. In order for you to access your Google Calendar events, it's necessary to first grant the access. Follow the [instructions here](https://developers.google.com/calendar/api/quickstart/python) to get the credentials.json file from your Google API. Don't worry, take your time. I'll be waiting here.
 
 8. Once done, copy the credentials.json file to the "gcal" folder in this project. Run the following command on your PC. A web browser should appear, asking you to grant access to your calendar. Once done, you should see a "token.pickle" file in your "gcal" folder.
 
@@ -82,4 +82,4 @@ PS: I'm aware that the instructions above may not be complete, especially when i
 I won't be updating this code much, since it has been serving me well. Nevertheless, feel free to fork the repo and modify it for your own purpose.
 
 ## What's Next
-Honestly, the cost of this project is way too high for a single purpose device. Personally, I've been looking at E-Ink tablets that emulate the experience of writing on paper, and allow the users to take notes on the go. Those familiar with this range of products would be aware of the reMarkable tablet, Ratta Supernote, Kobo Elipsa and many others. My next project is likely to enhance one of these devices such that the calendar will be displayed when it's not in use. While this is usually possible through setting the sleep screen image / screensaver manually, I would like to enhance it such that the screensaver is updated automatically when there are changes to the calendar.
+Honestly, the cost of this project is way too high for a single purpose device. Personally, I've been looking at E-Ink tablets that emulate the experience of writing on paper, and allow the users to take notes on the go. Those familiar with this range of products would be aware of the reMarkable tablet, Ratta Supernote, Kobo Elipsa and many others. My next project is likely to enhance one of these devices such that the calendar will be displayed when it's not in use. While this is usually possible by manually setting the sleep screen image / screensaver, I'm looking to have the screensaver updated automatically on a daily basis, like how it was done in this project.
