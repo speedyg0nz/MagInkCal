@@ -7,13 +7,14 @@ Back in 2019, I [started a thread in Reddit](https://www.reddit.com/r/RASPBERRY_
 ## Hardware Required
 - [Raspberry Pi Zero WH](https://www.raspberrypi.org/blog/zero-wh/) - Header pins are needed to connect to the E-Ink display
 - [Waveshare 12.48" Tri-color E-Ink Display](https://www.waveshare.com/product/12.48inch-e-paper-module-b.htm) - Unfortunately out of stock at the time this is published
-- [PiSugar2 for Raspberry Pi Zero](https://www.pisugar.com/) ([Tindie](https://www.tindie.com/products/pisugar/pisugar2-battery-for-raspberry-pi-zero/)) - Highly recommended, wish they had an even bigger battery though
+- [PiSugar2 for Raspberry Pi Zero](https://www.pisugar.com/) ([Tindie](https://www.tindie.com/products/pisugar/pisugar2-battery-for-raspberry-pi-zero/)) - Provides the RTC and battery for this project
 
 ## How It Works
 Through PiSugar2's web interface, the onboard RTC would trigger the RPi to boot up the RPi daily at 6AM. Upon boot, a cronjob on the RPi is triggered to run a Python script that fetches calendar events from Google Calendar for the next few weeks, and formats them into the desired layout before displaying it on the E-Ink display. The RPi then shuts down to conserve battery. The calendar remains displayed on the E-Ink screen, because well, E-Ink...
 
 Some features of the calendar: 
-- Since I had the luxury of using red for the display, I used it to highlight the current date, as well as recently added/updated events.
+- Battery life is the big question so I'll address it first. I'm getting around 3-4 weeks before needing to recharge the PiSugar2. I'm fairly happy with this but I'm sure this can be extended if I optimize the code further.
+- Since I had the luxury of using red for the E-Ink display, I used it to highlight the current date, as well as recently added/updated events.
 - I don't like having long bars that span across multiple days for multi-day events, so I chose to display only the start and end dates for those events, and adding small left/right arrows accordingly,
 - Given limited space (oh why are large E-Ink screens still so expensive!) and resolution on the display, I could only show 3 events per day and an indicator (e.g. 4 more) for those not displayed 
 - The calendar always starts from the current week, and displays the next four (total 35 days). If the dates cross over to the new month, it's displayed in grey instead of black.
@@ -69,12 +70,16 @@ crontab -e
 @reboot cd /location/to/your/maginkcal && python3 maginkcal.py
 ```
 
-12. That's all! Your Magic Calendar should now be refreshed at the time interval that you specified in the PiSugar2 web interface! I realize that the instructions above may not be complete, especially when it comes to the Python libraries to be installed, so feel free to ping me if you noticed anything missing.
+12. That's all! Your Magic Calendar should now be refreshed at the time interval that you specified in the PiSugar2 web interface! 
+
+PS: I'm aware that the instructions above may not be complete, especially when it comes to the Python libraries to be installed, so feel free to ping me if you noticed anything missing and I'll add it to the steps above.
 
 ## Acknowledgements
 - [Quattrocento Font](https://fonts.google.com/specimen/Quattrocento): Font used for the calendar display
 - [Bootstrap Calendar CSS](https://bootstrapious.com/p/bootstrap-calendar): Stylesheet that adapted heavily for the calendar display
 
-
 ## Contributing
-Honestly, I probably won't be updating this code much, since it's working well for me. Nevertheless, feel free to fork and modify it for your purpose.
+I won't be updating this code much, since it has been serving me well. Nevertheless, feel free to fork the repo and modify it for your own purpose.
+
+## What's Next
+Honestly, the cost of this project is way too high for a single purpose device. Personally, I've been looking at E-Ink tablets that emulate the experience of writing on paper, and allow the users to take notes on the go. Those familiar with this range of products would be aware of the reMarkable tablet, Ratta Supernote, Kobo Elipsa and many others. My next project is likely to enhance one of these devices such that the calendar will be displayed when it's not in use. While this is usually possible through setting the sleep screen image / screensaver manually, I would like to enhance it such that the screensaver is updated automatically when there are changes to the calendar.
