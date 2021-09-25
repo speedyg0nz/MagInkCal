@@ -121,21 +121,17 @@ class RenderHelper:
                 if idx < len(calList):
                     calList[idx].append(event)
 
-        # Read in the HTML segments for the top and bottom
-        with open(self.currPath + '/calendar_top.html', 'r') as file:
-            calTopHtmlStr = file.read()
-
-        with open(self.currPath + '/calendar_bottom.html', 'r') as file:
-            calBottomHtmlStr = file.read()
+        # Read html template
+        with open(self.currPath + '/calendar_template.html', 'r') as file:
+            calendar_template = file.read()
 
         # Insert month header
-        calHtmlList = [calTopHtmlStr, str(calDict['today'].month), '</h2></div>']
+        month_name = str(calDict['today'].month)
 
         # Insert battery icon
         # batteryDisplayMode - 0: do not show / 1: always show / 2: show when battery is low
         if batteryDisplayMode > 0:
             battLevel = calDict['batteryLevel']
-            battText = ''
             if battLevel >= 80:
                 battText = 'battery80'
             elif battLevel >= 60:
@@ -149,57 +145,55 @@ class RenderHelper:
 
             if batteryDisplayMode == 1 or battText == 'battery0':
                 # Only display if batteryDisplayMode is set to "always show" or "show when battery is low"
-                calHtmlList.append('<div class="batt_container"><img class="')
-                calHtmlList.append(battText)
-                calHtmlList.append('" src="battery.png" /></div>')
-
+                battText = '<img class="' + battText + '" src="battery.png" />'
+            else:
+                battText = ''
         # Populate the day of week row
-        calHtmlList.append('<ol class="day-names list-unstyled text-center">')
-        for i in range (0,7):
-            calHtmlList.append('<li class="font-weight-bold text-uppercase">')
-            calHtmlList.append(dayOfWeekText[(i + weekStartDay) % 7])
-            calHtmlList.append('</li>')
-        calHtmlList.append('</ol><ol class="days list-unstyled">')
+        cal_days_of_week = ''
+        for i in range(0, 7):
+            cal_days_of_week += '<li class="font-weight-bold text-uppercase">' + dayOfWeekText[
+                (i + weekStartDay) % 7] + "</li>\n"
 
         # Populate the date and events
+        cal_events_text = ''
         for i in range(len(calList)):
             currDate = calDict['calStartDate'] + timedelta(days=i)
             dayOfMonth = currDate.day
             if currDate == calDict['today']:
-                calHtmlList.append('<li><div class="datecircle">' + str(dayOfMonth) + '</div>')
+                cal_events_text += '<li><div class="datecircle">' + str(dayOfMonth) + '</div>\n'
             elif currDate.month != calDict['today'].month:
-                calHtmlList.append('<li><div class="date text-muted">' + str(dayOfMonth) + '</div>')
+                cal_events_text += '<li><div class="date text-muted">' + str(dayOfMonth) + '</div>\n'
             else:
-                calHtmlList.append('<li><div class="date">' + str(dayOfMonth) + '</div>')
+                cal_events_text += '<li><div class="date">' + str(dayOfMonth) + '</div>\n'
 
             for j in range(min(len(calList[i]), maxEventsPerDay)):
                 event = calList[i][j]
-                calHtmlList.append('<div class="event')
+                cal_events_text += '<div class="event'
                 if event['isUpdated']:
-                    calHtmlList.append(' text-danger')
+                    cal_events_text += ' text-danger'
                 elif currDate.month != calDict['today'].month:
-                    calHtmlList.append(' text-muted')
+                    cal_events_text += ' text-muted'
                 if event['isMultiday']:
                     if event['startDatetime'].date() == currDate:
-                        calHtmlList.append('">►'+event['summary'])
+                        cal_events_text += '">►' + event['summary']
                     else:
-                        #calHtmlList.append(' text-multiday">')
-                        calHtmlList.append('">◄' + event['summary'])
+                        # calHtmlList.append(' text-multiday">')
+                        cal_events_text += '">◄' + event['summary']
                 elif event['allday']:
-                    calHtmlList.append('">' + event['summary'])
+                    cal_events_text += '">' + event['summary']
                 else:
-                    calHtmlList.append('">' + self.get_short_time(event['startDatetime'], is24hour) + ' ' + event['summary'])
-                calHtmlList.append('</div>\n')
+                    cal_events_text += '">' + self.get_short_time(event['startDatetime'], is24hour) + ' ' + event[
+                        'summary']
+                cal_events_text += '</div>\n'
             if len(calList[i]) > maxEventsPerDay:
-                calHtmlList.append('<div class="event text-muted">' + str(len(calList[i])-maxEventsPerDay) + ' more')
+                cal_events_text += '<div class="event text-muted">' + str(len(calList[i]) - maxEventsPerDay) + ' more'
 
-            calHtmlList.append('</li>\n')
+            cal_events_text += '</li>\n'
 
         # Append the bottom and write the file
-        calHtmlList.append(calBottomHtmlStr)
-        calHtml = ''.join(calHtmlList)
         htmlFile = open(self.currPath + '/calendar.html', "w")
-        htmlFile.write(calHtml)
+        htmlFile.write(calendar_template.format(month=month_name, battText=battText, dayOfWeek=cal_days_of_week,
+                                                events=cal_events_text))
         htmlFile.close()
 
         calBlackImage, calRedImage = self.get_screenshot()
