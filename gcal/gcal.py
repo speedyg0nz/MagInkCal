@@ -18,7 +18,7 @@ from google.auth.transport.requests import Request
 class GcalHelper:
 
     def __init__(self):
-        #Initialise the Google Calendar using the provided credentials and token
+        # Initialise the Google Calendar using the provided credentials and token
         SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
         self.currPath = str(pathlib.Path(__file__).parent.absolute())
         print(self.currPath)
@@ -67,7 +67,7 @@ class GcalHelper:
         # check if event stretches across multiple days
         return start.date() != end.date()
 
-    def retrieve_events(self, startDatetime, endDatetime, localTZ, thresholdHours):
+    def retrieve_events(self, calendars, startDatetime, endDatetime, localTZ, thresholdHours):
         # Call the Google Calendar API and return a list of events that fall within the specified dates
         eventList = []
 
@@ -77,10 +77,18 @@ class GcalHelper:
             return eventList
 
         print('Retreiving events between ' + minTimeStr + ' and ' + maxTimeStr + '...')
-        events_result = self.service.events().list(calendarId='primary', timeMin=minTimeStr,
-                                                   timeMax=maxTimeStr, singleEvents=True,
-                                                   orderBy='startTime').execute()
-        events = events_result.get('items', [])
+        events_result = []
+        for cal in calendars:
+            events_result.append(
+                self.service.events().list(calendarId=cal, timeMin=minTimeStr,
+                                           timeMax=maxTimeStr, singleEvents=True,
+                                           orderBy='startTime').execute()
+            )
+
+        events = []
+        for eve in events_result:
+            events += eve.get('items', [])
+            # events = events_result.get('items', [])
 
         if not events:
             print('No upcoming events found.')

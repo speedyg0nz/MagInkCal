@@ -35,6 +35,7 @@ def main():
     imageWidth = config['imageWidth']  # Width of image to be generated for display.
     imageHeight = config['imageHeight'] # Height of image to be generated for display.
     rotateAngle = config['rotateAngle']  # If image is rendered in portrait orientation, angle to rotate to fit screen
+    calendars = config['calendars']  # Google calendar ids
 
     # Create and configure logger
     logging.basicConfig(filename="logfile.log", format='%(asctime)s %(levelname)s - %(message)s', filemode='a')
@@ -62,7 +63,7 @@ def main():
 
         # Using Google Calendar to retrieve all events within start and end date (inclusive)
         gcalService = GcalHelper()
-        eventList = gcalService.retrieve_events(calStartDatetime, calEndDatetime, displayTZ, thresholdHours)
+        eventList = gcalService.retrieve_events(calendars, calStartDatetime, calEndDatetime, displayTZ, thresholdHours)
         logger.info("Calendar events retrieved")
 
         # Populate dictionary with information to be rendered on e-ink display

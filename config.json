@@ -11,5 +11,8 @@
   "screenHeight": 984,
   "imageWidth": 984,
   "imageHeight": 1304,
-  "rotateAngle": 270
+  "rotateAngle": 270,
+  "calendars": [
+    "primary"
+  ]
 }
