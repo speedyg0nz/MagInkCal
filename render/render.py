@@ -19,6 +19,7 @@ import pathlib
 from PIL import Image
 import logging
 
+
 class RenderHelper:
 
     def __init__(self, width, height, angle):
@@ -28,7 +29,7 @@ class RenderHelper:
         self.imageWidth = width
         self.imageHeight = height
         self.rotateAngle = angle
-        #print(self.htmlFile)
+        # print(self.htmlFile)
 
     def set_viewport_size(self, driver):
         window_size = driver.execute_script("""
@@ -51,29 +52,28 @@ class RenderHelper:
         self.logger.info('Screenshot captured and saved to file.')
         print('Screenshot captured. Processing colours...')
 
-        redimg = Image.open(self.currPath + '/calendar.png') # get image)
-        pixels = redimg.load() # create the pixel map
+        redimg = Image.open(self.currPath + '/calendar.png')  # get image)
+        pixels = redimg.load()  # create the pixel map
 
-        for i in range(redimg.size[0]): # for every pixel:
+        for i in range(redimg.size[0]):  # for every pixel:
             for j in range(redimg.size[1]):
-                if pixels[i, j][0] <= pixels[i, j][1] and pixels[i, j][0] <= pixels[i, j][2]  :  # if is red
-                    pixels[i,j] = (255, 255, 255) # change to white
+                if pixels[i, j][0] <= pixels[i, j][1] and pixels[i, j][0] <= pixels[i, j][2]:  # if is red
+                    pixels[i, j] = (255, 255, 255)  # change to white
         redimg = redimg.rotate(self.rotateAngle, expand=True)
 
-        blackimg = Image.open(self.currPath + '/calendar.png') # get image)
-        pixels = blackimg.load() # create the pixel map
+        blackimg = Image.open(self.currPath + '/calendar.png')  # get image)
+        pixels = blackimg.load()  # create the pixel map
 
-        for i in range(blackimg.size[0]): # for every pixel:
+        for i in range(blackimg.size[0]):  # for every pixel:
             for j in range(blackimg.size[1]):
                 if pixels[i, j][0] > pixels[i, j][1] and pixels[i, j][0] > pixels[i, j][2]:  # if is red
-                    pixels[i,j] = (255, 255, 255) # change to white
+                    pixels[i, j] = (255, 255, 255)  # change to white
         blackimg = blackimg.rotate(self.rotateAngle, expand=True)
 
         self.logger.info('Image colours processed. Extracted grayscale and red images.')
         print('Image colours processed. Returning grayscale and red images.')
 
         return blackimg, redimg
-
 
     def get_day_in_cal(self, startDate, eventDate):
         delta = eventDate - startDate
@@ -130,8 +130,11 @@ class RenderHelper:
 
         # Insert battery icon
         # batteryDisplayMode - 0: do not show / 1: always show / 2: show when battery is low
-        if batteryDisplayMode > 0:
-            battLevel = calDict['batteryLevel']
+        battLevel = calDict['batteryLevel']
+
+        if batteryDisplayMode == 0:
+            battText = 'batteryHide'
+        elif batteryDisplayMode == 1:
             if battLevel >= 80:
                 battText = 'battery80'
             elif battLevel >= 60:
@@ -143,11 +146,11 @@ class RenderHelper:
             else:
                 battText = 'battery0'
 
-            if batteryDisplayMode == 1 or battText == 'battery0':
-                # Only display if batteryDisplayMode is set to "always show" or "show when battery is low"
-                battText = '<img class="' + battText + '" src="battery.png" />'
-            else:
-                battText = ''
+        elif batteryDisplayMode == 2 and battLevel < 20.0:
+            battText = 'battery0'
+        elif batteryDisplayMode == 2 and battLevel >= 20.0:
+            battText = 'batteryHide'
+        print(battLevel, battText)
         # Populate the day of week row
         cal_days_of_week = ''
         for i in range(0, 7):
