@@ -80,7 +80,7 @@ PS: I'm aware that the instructions above may not be complete, especially when i
 ## Acknowledgements
 - [Quattrocento Font](https://fonts.google.com/specimen/Quattrocento): Font used for the calendar display
 - [Bootstrap Calendar CSS](https://bootstrapious.com/p/bootstrap-calendar): Stylesheet that adapted heavily for the calendar display
-- [/u/aceisace](https://www.reddit.com/user/aceisace/): For the tips on E-Ink development and the [InkyCal](https://github.com/aceisace/Inkycal) repo.   
+- [/u/aceisace](https://www.reddit.com/user/aceisace/): For the tips on E-Ink development and the [InkyCal](https://github.com/aceisace/Inkycal) repo (worth checking out even though I didn't use it for this project).   
   
 ## Contributing
 I won't be updating this code much, since it has been serving me well. Nevertheless, feel free to fork the repo and modify it for your own purpose. At the same time, check out other similar projects, such as [InkyCal](https://github.com/aceisace/Inkycal). It's much more polished and also actively developed.
