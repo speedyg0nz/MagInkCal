@@ -12,7 +12,7 @@
   "imageWidth": 984,
   "imageHeight": 1304,
   "rotateAngle": 270,
-  "is24h": true,
+  "is24h": false,
   "calendars": [
     "primary"
   ]

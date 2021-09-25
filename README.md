@@ -22,6 +22,8 @@ Some features of the calendar:
 - Given limited space (oh why are large E-Ink screens still so expensive!) and resolution on the display, I could only show 3 events per day and an indicator (e.g. 4 more) for those not displayed 
 - The calendar always starts from the current week, and displays the next four (total 35 days). If the dates cross over to the new month, it's displayed in grey instead of black.
 
+![MagInkCal Basics](https://user-images.githubusercontent.com/5581989/134775456-d6bacaca-03c7-4357-af28-7c06aa19ed90.png)
+
 ## Setting Up Raspberry Pi Zero
 
 1. Start by flashing [Raspberrypi OS Lite](https://www.raspberrypi.org/software/operating-systems/) to a MicroSD Card.
@@ -38,6 +40,9 @@ sudo apt update
 sudo apt-get install python3-pip
 sudo apt-get install chromium-chromedriver
 pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+pip3 install pytz
+pip3 install selenium
+pip3 install Pillow
 ```
 
 4. Run the following commands in the RPi Terminal to install the libraries needed to drive the E-Ink display. See [this page](https://www.waveshare.com/wiki/12.48inch_e-Paper_Module) for more details.
@@ -80,6 +85,7 @@ PS: I'm aware that the instructions above may not be complete, especially when i
 ## Acknowledgements
 - [Quattrocento Font](https://fonts.google.com/specimen/Quattrocento): Font used for the calendar display
 - [Bootstrap Calendar CSS](https://bootstrapious.com/p/bootstrap-calendar): Stylesheet that adapted heavily for the calendar display
+- [emagra](https://github.com/emagra): For adding in new features, such as 24hr display and multiple calendar selection. 
 - [/u/aceisace](https://www.reddit.com/user/aceisace/): For the tips on E-Ink development and the [InkyCal](https://github.com/aceisace/Inkycal) repo (worth checking out even though I didn't use it for this project).   
   
 ## Contributing

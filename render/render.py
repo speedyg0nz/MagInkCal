@@ -32,16 +32,28 @@ class RenderHelper:
         # print(self.htmlFile)
 
     def set_viewport_size(self, driver):
-        window_size = driver.execute_script("""
-            return [window.outerWidth - window.innerWidth + arguments[0],
-              window.outerHeight - window.innerHeight + arguments[1]];
-            """, self.imageWidth, self.imageHeight)
-        driver.set_window_size(*window_size)
+
+        # Extract the current window size from the driver
+        current_window_size = driver.get_window_size()
+
+        # Extract the client window size from the html tag
+        html = driver.find_element_by_tag_name('html')
+        inner_width = int(html.get_attribute("clientWidth"))
+        inner_height = int(html.get_attribute("clientHeight"))
+
+        # "Internal width you want to set+Set "outer frame width" to window size
+        target_width = self.imageWidth + (current_window_size["width"] - inner_width)
+        target_height = self.imageHeight + (current_window_size["height"] - inner_height)
+
+        driver.set_window_rect(
+            width=target_width,
+            height=target_height)
 
     def get_screenshot(self):
         opts = Options()
         opts.add_argument("--headless")
         opts.add_argument("--hide-scrollbars");
+        opts.add_argument('--force-device-scale-factor=1')
         driver = webdriver.Chrome(options=opts)
         self.set_viewport_size(driver)
         driver.get(self.htmlFile)
@@ -150,7 +162,7 @@ class RenderHelper:
             battText = 'battery0'
         elif batteryDisplayMode == 2 and battLevel >= 20.0:
             battText = 'batteryHide'
-        print(battLevel, battText)
+
         # Populate the day of week row
         cal_days_of_week = ''
         for i in range(0, 7):

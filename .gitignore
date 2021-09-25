@@ -1,3 +1,11 @@
+# Google Calendar API Credential and Token
+gcal/credentials.json
+gcal/token.pickle
+
+# Intermediate render files
+render/calendar.html
+render/calendar.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -26,6 +34,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.idea/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
