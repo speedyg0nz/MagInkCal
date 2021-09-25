@@ -22,6 +22,8 @@ Some features of the calendar:
 - Given limited space (oh why are large E-Ink screens still so expensive!) and resolution on the display, I could only show 3 events per day and an indicator (e.g. 4 more) for those not displayed 
 - The calendar always starts from the current week, and displays the next four (total 35 days). If the dates cross over to the new month, it's displayed in grey instead of black.
 
+![MagInkCal Basics](https://user-images.githubusercontent.com/5581989/134775456-d6bacaca-03c7-4357-af28-7c06aa19ed90.png)
+
 ## Setting Up Raspberry Pi Zero
 
 1. Start by flashing [Raspberrypi OS Lite](https://www.raspberrypi.org/software/operating-systems/) to a MicroSD Card.
