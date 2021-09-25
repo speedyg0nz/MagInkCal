@@ -79,19 +79,22 @@ class RenderHelper:
         delta = eventDate - startDate
         return delta.days
 
-    def get_short_time(self, datetimeObj):
+    def get_short_time(self, datetimeObj, is24hour=False):
         datetimeStr = ''
-        if datetimeObj.minute > 0:
-            datetimeStr = ('.{:02d}').format(datetimeObj.minute)
-
-        if datetimeObj.hour == 0:
-            datetimeStr = '12' + datetimeStr + 'am'
-        elif datetimeObj.hour == 12:
-            datetimeStr = '12' + datetimeStr + 'pm'
-        elif datetimeObj.hour > 12:
-            datetimeStr = str(datetimeObj.hour % 12) + datetimeStr + 'pm'
+        if is24hour:
+            datetimeStr = '{:02d}'.format(datetimeObj.hour) + ':{:02d}'.format(datetimeObj.minute)
         else:
-            datetimeStr = str(datetimeObj.hour) + datetimeStr + 'am'
+            if datetimeObj.minute > 0:
+                datetimeStr = ('.{:02d}').format(datetimeObj.minute)
+
+            if datetimeObj.hour == 0:
+                datetimeStr = '12' + datetimeStr + 'am'
+            elif datetimeObj.hour == 12:
+                datetimeStr = '12' + datetimeStr + 'pm'
+            elif datetimeObj.hour > 12:
+                datetimeStr = str(datetimeObj.hour % 12) + datetimeStr + 'pm'
+            else:
+                datetimeStr = str(datetimeObj.hour) + datetimeStr + 'am'
         return datetimeStr
 
     def process_inputs(self, calDict):
@@ -106,6 +109,7 @@ class RenderHelper:
         batteryDisplayMode = calDict['batteryDisplayMode']
         dayOfWeekText = calDict['dayOfWeekText']
         weekStartDay = calDict['weekStartDay']
+        is24hour = calDict['is24hour']
 
         # for each item in the eventList, add them to the relevant day in our calendar list
         for event in calDict['events']:
@@ -184,7 +188,7 @@ class RenderHelper:
                 elif event['allday']:
                     calHtmlList.append('">' + event['summary'])
                 else:
-                    calHtmlList.append('">' + self.get_short_time(event['startDatetime']) + ' ' + event['summary'])
+                    calHtmlList.append('">' + self.get_short_time(event['startDatetime'], is24hour) + ' ' + event['summary'])
                 calHtmlList.append('</div>\n')
             if len(calList[i]) > maxEventsPerDay:
                 calHtmlList.append('<div class="event text-muted">' + str(len(calList[i])-maxEventsPerDay) + ' more')

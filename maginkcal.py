@@ -36,6 +36,7 @@ def main():
     imageHeight = config['imageHeight'] # Height of image to be generated for display.
     rotateAngle = config['rotateAngle']  # If image is rendered in portrait orientation, angle to rotate to fit screen
     calendars = config['calendars']  # Google calendar ids
+    is24hour = config['is24h']  # set 24 hour time
 
     # Create and configure logger
     logging.basicConfig(filename="logfile.log", format='%(asctime)s %(levelname)s - %(message)s', filemode='a')
@@ -69,7 +70,8 @@ def main():
         # Populate dictionary with information to be rendered on e-ink display
         calDict = {'events': eventList, 'calStartDate': calStartDate, 'today': currDate, 'lastRefresh': currDatetime,
                    'batteryLevel': currBatteryLevel, 'batteryDisplayMode': batteryDisplayMode,
-                   'dayOfWeekText': dayOfWeekText, 'weekStartDay': weekStartDay, 'maxEventsPerDay': maxEventsPerDay}
+                   'dayOfWeekText': dayOfWeekText, 'weekStartDay': weekStartDay, 'maxEventsPerDay': maxEventsPerDay,
+                   'is24hour': is24hour}
 
         renderService = RenderHelper(imageWidth, imageHeight, rotateAngle)
         calBlackImage, calRedImage = renderService.process_inputs(calDict)
