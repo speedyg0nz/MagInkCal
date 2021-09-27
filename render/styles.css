@@ -243,6 +243,10 @@ div.batt_container .battery0 {
   top: -178px;
 }
 
+div.batt_container .batteryHide {
+    display: none;
+}
+
 /*
 *
 * ==========================================

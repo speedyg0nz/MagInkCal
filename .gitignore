@@ -1,3 +1,17 @@
+# Google Calendar API Credential and Token
+gcal/credentials.json
+gcal/token.pickle
+
+# Intermediate render files
+render/calendar.html
+render/calendar.png
+
+#intellij config
+.idea/
+
+#Mac metadata file
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

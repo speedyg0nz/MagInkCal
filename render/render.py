@@ -19,6 +19,7 @@ import pathlib
 from PIL import Image
 import logging
 
+
 class RenderHelper:
 
     def __init__(self, width, height, angle):
@@ -28,19 +29,31 @@ class RenderHelper:
         self.imageWidth = width
         self.imageHeight = height
         self.rotateAngle = angle
-        #print(self.htmlFile)
+        # print(self.htmlFile)
 
     def set_viewport_size(self, driver):
-        window_size = driver.execute_script("""
-            return [window.outerWidth - window.innerWidth + arguments[0],
-              window.outerHeight - window.innerHeight + arguments[1]];
-            """, self.imageWidth, self.imageHeight)
-        driver.set_window_size(*window_size)
+
+        # Extract the current window size from the driver
+        current_window_size = driver.get_window_size()
+
+        # Extract the client window size from the html tag
+        html = driver.find_element_by_tag_name('html')
+        inner_width = int(html.get_attribute("clientWidth"))
+        inner_height = int(html.get_attribute("clientHeight"))
+
+        # "Internal width you want to set+Set "outer frame width" to window size
+        target_width = self.imageWidth + (current_window_size["width"] - inner_width)
+        target_height = self.imageHeight + (current_window_size["height"] - inner_height)
+
+        driver.set_window_rect(
+            width=target_width,
+            height=target_height)
 
     def get_screenshot(self):
         opts = Options()
         opts.add_argument("--headless")
         opts.add_argument("--hide-scrollbars");
+        opts.add_argument('--force-device-scale-factor=1')
         driver = webdriver.Chrome(options=opts)
         self.set_viewport_size(driver)
         driver.get(self.htmlFile)
@@ -51,22 +64,22 @@ class RenderHelper:
         self.logger.info('Screenshot captured and saved to file.')
         print('Screenshot captured. Processing colours...')
 
-        redimg = Image.open(self.currPath + '/calendar.png') # get image)
-        pixels = redimg.load() # create the pixel map
+        redimg = Image.open(self.currPath + '/calendar.png')  # get image)
+        pixels = redimg.load()  # create the pixel map
 
-        for i in range(redimg.size[0]): # for every pixel:
+        for i in range(redimg.size[0]):  # for every pixel:
             for j in range(redimg.size[1]):
-                if pixels[i, j][0] <= pixels[i, j][1] and pixels[i, j][0] <= pixels[i, j][2]  :  # if is red
-                    pixels[i,j] = (255, 255, 255) # change to white
+                if pixels[i, j][0] <= pixels[i, j][1] and pixels[i, j][0] <= pixels[i, j][2]:  # if is red
+                    pixels[i, j] = (255, 255, 255)  # change to white
         redimg = redimg.rotate(self.rotateAngle, expand=True)
 
-        blackimg = Image.open(self.currPath + '/calendar.png') # get image)
-        pixels = blackimg.load() # create the pixel map
+        blackimg = Image.open(self.currPath + '/calendar.png')  # get image)
+        pixels = blackimg.load()  # create the pixel map
 
-        for i in range(blackimg.size[0]): # for every pixel:
+        for i in range(blackimg.size[0]):  # for every pixel:
             for j in range(blackimg.size[1]):
                 if pixels[i, j][0] > pixels[i, j][1] and pixels[i, j][0] > pixels[i, j][2]:  # if is red
-                    pixels[i,j] = (255, 255, 255) # change to white
+                    pixels[i, j] = (255, 255, 255)  # change to white
         blackimg = blackimg.rotate(self.rotateAngle, expand=True)
 
         self.logger.info('Image colours processed. Extracted grayscale and red images.')
@@ -74,24 +87,26 @@ class RenderHelper:
 
         return blackimg, redimg
 
-
     def get_day_in_cal(self, startDate, eventDate):
         delta = eventDate - startDate
         return delta.days
 
-    def get_short_time(self, datetimeObj):
+    def get_short_time(self, datetimeObj, is24hour=False):
         datetimeStr = ''
-        if datetimeObj.minute > 0:
-            datetimeStr = ('.{:02d}').format(datetimeObj.minute)
-
-        if datetimeObj.hour == 0:
-            datetimeStr = '12' + datetimeStr + 'am'
-        elif datetimeObj.hour == 12:
-            datetimeStr = '12' + datetimeStr + 'pm'
-        elif datetimeObj.hour > 12:
-            datetimeStr = str(datetimeObj.hour % 12) + datetimeStr + 'pm'
+        if is24hour:
+            datetimeStr = '{:02d}'.format(datetimeObj.hour) + ':{:02d}'.format(datetimeObj.minute)
         else:
-            datetimeStr = str(datetimeObj.hour) + datetimeStr + 'am'
+            if datetimeObj.minute > 0:
+                datetimeStr = ('.{:02d}').format(datetimeObj.minute)
+
+            if datetimeObj.hour == 0:
+                datetimeStr = '12' + datetimeStr + 'am'
+            elif datetimeObj.hour == 12:
+                datetimeStr = '12' + datetimeStr + 'pm'
+            elif datetimeObj.hour > 12:
+                datetimeStr = str(datetimeObj.hour % 12) + datetimeStr + 'pm'
+            else:
+                datetimeStr = str(datetimeObj.hour) + datetimeStr + 'am'
         return datetimeStr
 
     def process_inputs(self, calDict):
@@ -106,6 +121,7 @@ class RenderHelper:
         batteryDisplayMode = calDict['batteryDisplayMode']
         dayOfWeekText = calDict['dayOfWeekText']
         weekStartDay = calDict['weekStartDay']
+        is24hour = calDict['is24hour']
 
         # for each item in the eventList, add them to the relevant day in our calendar list
         for event in calDict['events']:
@@ -117,21 +133,20 @@ class RenderHelper:
                 if idx < len(calList):
                     calList[idx].append(event)
 
-        # Read in the HTML segments for the top and bottom
-        with open(self.currPath + '/calendar_top.html', 'r') as file:
-            calTopHtmlStr = file.read()
-
-        with open(self.currPath + '/calendar_bottom.html', 'r') as file:
-            calBottomHtmlStr = file.read()
+        # Read html template
+        with open(self.currPath + '/calendar_template.html', 'r') as file:
+            calendar_template = file.read()
 
         # Insert month header
-        calHtmlList = [calTopHtmlStr, str(calDict['today'].month), '</h2></div>']
+        month_name = str(calDict['today'].month)
 
         # Insert battery icon
         # batteryDisplayMode - 0: do not show / 1: always show / 2: show when battery is low
-        if batteryDisplayMode > 0:
-            battLevel = calDict['batteryLevel']
-            battText = ''
+        battLevel = calDict['batteryLevel']
+
+        if batteryDisplayMode == 0:
+            battText = 'batteryHide'
+        elif batteryDisplayMode == 1:
             if battLevel >= 80:
                 battText = 'battery80'
             elif battLevel >= 60:
@@ -143,59 +158,57 @@ class RenderHelper:
             else:
                 battText = 'battery0'
 
-            if batteryDisplayMode == 1 or battText == 'battery0':
-                # Only display if batteryDisplayMode is set to "always show" or "show when battery is low"
-                calHtmlList.append('<div class="batt_container"><img class="')
-                calHtmlList.append(battText)
-                calHtmlList.append('" src="battery.png" /></div>')
+        elif batteryDisplayMode == 2 and battLevel < 20.0:
+            battText = 'battery0'
+        elif batteryDisplayMode == 2 and battLevel >= 20.0:
+            battText = 'batteryHide'
 
         # Populate the day of week row
-        calHtmlList.append('<ol class="day-names list-unstyled text-center">')
-        for i in range (0,7):
-            calHtmlList.append('<li class="font-weight-bold text-uppercase">')
-            calHtmlList.append(dayOfWeekText[(i + weekStartDay) % 7])
-            calHtmlList.append('</li>')
-        calHtmlList.append('</ol><ol class="days list-unstyled">')
+        cal_days_of_week = ''
+        for i in range(0, 7):
+            cal_days_of_week += '<li class="font-weight-bold text-uppercase">' + dayOfWeekText[
+                (i + weekStartDay) % 7] + "</li>\n"
 
         # Populate the date and events
+        cal_events_text = ''
         for i in range(len(calList)):
             currDate = calDict['calStartDate'] + timedelta(days=i)
             dayOfMonth = currDate.day
             if currDate == calDict['today']:
-                calHtmlList.append('<li><div class="datecircle">' + str(dayOfMonth) + '</div>')
+                cal_events_text += '<li><div class="datecircle">' + str(dayOfMonth) + '</div>\n'
             elif currDate.month != calDict['today'].month:
-                calHtmlList.append('<li><div class="date text-muted">' + str(dayOfMonth) + '</div>')
+                cal_events_text += '<li><div class="date text-muted">' + str(dayOfMonth) + '</div>\n'
             else:
-                calHtmlList.append('<li><div class="date">' + str(dayOfMonth) + '</div>')
+                cal_events_text += '<li><div class="date">' + str(dayOfMonth) + '</div>\n'
 
             for j in range(min(len(calList[i]), maxEventsPerDay)):
                 event = calList[i][j]
-                calHtmlList.append('<div class="event')
+                cal_events_text += '<div class="event'
                 if event['isUpdated']:
-                    calHtmlList.append(' text-danger')
+                    cal_events_text += ' text-danger'
                 elif currDate.month != calDict['today'].month:
-                    calHtmlList.append(' text-muted')
+                    cal_events_text += ' text-muted'
                 if event['isMultiday']:
                     if event['startDatetime'].date() == currDate:
-                        calHtmlList.append('">►'+event['summary'])
+                        cal_events_text += '">►' + event['summary']
                     else:
-                        #calHtmlList.append(' text-multiday">')
-                        calHtmlList.append('">◄' + event['summary'])
+                        # calHtmlList.append(' text-multiday">')
+                        cal_events_text += '">◄' + event['summary']
                 elif event['allday']:
-                    calHtmlList.append('">' + event['summary'])
+                    cal_events_text += '">' + event['summary']
                 else:
-                    calHtmlList.append('">' + self.get_short_time(event['startDatetime']) + ' ' + event['summary'])
-                calHtmlList.append('</div>\n')
+                    cal_events_text += '">' + self.get_short_time(event['startDatetime'], is24hour) + ' ' + event[
+                        'summary']
+                cal_events_text += '</div>\n'
             if len(calList[i]) > maxEventsPerDay:
-                calHtmlList.append('<div class="event text-muted">' + str(len(calList[i])-maxEventsPerDay) + ' more')
+                cal_events_text += '<div class="event text-muted">' + str(len(calList[i]) - maxEventsPerDay) + ' more'
 
-            calHtmlList.append('</li>\n')
+            cal_events_text += '</li>\n'
 
         # Append the bottom and write the file
-        calHtmlList.append(calBottomHtmlStr)
-        calHtml = ''.join(calHtmlList)
         htmlFile = open(self.currPath + '/calendar.html', "w")
-        htmlFile.write(calHtml)
+        htmlFile.write(calendar_template.format(month=month_name, battText=battText, dayOfWeek=cal_days_of_week,
+                                                events=cal_events_text))
         htmlFile.close()
 
         calBlackImage, calRedImage = self.get_screenshot()
