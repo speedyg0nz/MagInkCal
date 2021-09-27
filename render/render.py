@@ -92,22 +92,22 @@ class RenderHelper:
         return delta.days
 
     def get_short_time(self, datetimeObj, is24hour=False):
-        datetimeStr = ''
+        datetime_str = ''
         if is24hour:
-            datetimeStr = '{:02d}'.format(datetimeObj.hour) + ':{:02d}'.format(datetimeObj.minute)
+            datetime_str = '{}:{:02d}'.format(datetimeObj.hour, datetimeObj.minute)
         else:
             if datetimeObj.minute > 0:
-                datetimeStr = ('.{:02d}').format(datetimeObj.minute)
+                datetime_str = '.{:02d}'.format(datetimeObj.minute)
 
             if datetimeObj.hour == 0:
-                datetimeStr = '12' + datetimeStr + 'am'
+                datetime_str = '12{}am'.format(datetime_str)
             elif datetimeObj.hour == 12:
-                datetimeStr = '12' + datetimeStr + 'pm'
+                datetime_str = '12{}pm'.format(datetime_str)
             elif datetimeObj.hour > 12:
-                datetimeStr = str(datetimeObj.hour % 12) + datetimeStr + 'pm'
+                datetime_str = '{}{}pm'.format(str(datetimeObj.hour % 12), datetime_str)
             else:
-                datetimeStr = str(datetimeObj.hour) + datetimeStr + 'am'
-        return datetimeStr
+                datetime_str = '{}{}am'.format(str(datetimeObj.hour), datetime_str)
+        return datetime_str
 
     def process_inputs(self, calDict):
         # calDict = {'events': eventList, 'calStartDate': calStartDate, 'today': currDate, 'lastRefresh': currDatetime, 'batteryLevel': batteryLevel}
