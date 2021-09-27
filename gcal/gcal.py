@@ -116,4 +116,8 @@ class GcalHelper:
             newEvent['isMultiday'] = self.is_multiday(newEvent['startDatetime'], newEvent['endDatetime'])
             eventList.append(newEvent)
 
+        # We need to sort eventList because the event will be sorted in "calendar order" instead of hours order
+        # TODO: improve because of double cycle for now is not much cost
+        # eventList is max 105? 3 event per day 35 days
+        eventList = sorted(eventList, key=lambda k: k['startDatetime'])
         return eventList
