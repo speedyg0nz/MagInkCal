@@ -62,7 +62,6 @@ class RenderHelper:
         driver.quit()
 
         self.logger.info('Screenshot captured and saved to file.')
-        print('Screenshot captured. Processing colours...')
 
         redimg = Image.open(self.currPath + '/calendar.png')  # get image)
         pixels = redimg.load()  # create the pixel map
@@ -83,7 +82,6 @@ class RenderHelper:
         blackimg = blackimg.rotate(self.rotateAngle, expand=True)
 
         self.logger.info('Image colours processed. Extracted grayscale and red images.')
-        print('Image colours processed. Returning grayscale and red images.')
 
         return blackimg, redimg
 
