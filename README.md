@@ -13,7 +13,7 @@ Back in 2019, I [started a thread in Reddit](https://www.reddit.com/r/RASPBERRY_
 - [PiSugar2 for Raspberry Pi Zero](https://www.pisugar.com/) ([Tindie](https://www.tindie.com/products/pisugar/pisugar2-battery-for-raspberry-pi-zero/)) - Provides the RTC and battery for this project
 
 ## How It Works
-Through PiSugar2's web interface, the onboard RTC can be set to trigger the RPi to boot up daily at 6AM. Upon boot, a cronjob on the RPi is triggered to run a Python script that fetches calendar events from Google Calendar for the next few weeks, and formats them into the desired layout before displaying it on the E-Ink display. The RPi then shuts down to conserve battery. The calendar remains displayed on the E-Ink screen, because well, E-Ink...
+Through PiSugar2's web interface, the onboard RTC can be set to wake and trigger the RPi to boot up daily at a time of your preference. Upon boot, a cronjob on the RPi is triggered to run a Python script that fetches calendar events from Google Calendar for the next few weeks, and formats them into the desired layout before displaying it on the E-Ink display. The RPi then shuts down to conserve battery. The calendar remains displayed on the E-Ink screen, because well, E-Ink...
 
 Some features of the calendar: 
 - Battery life is the big question so I'll address it first. I'm getting around 3-4 weeks before needing to recharge the PiSugar2. I'm fairly happy with this but I'm sure this can be extended if I optimize the code further.
@@ -40,6 +40,9 @@ sudo apt update
 sudo apt-get install python3-pip
 sudo apt-get install chromium-chromedriver
 pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+pip3 install pytz
+pip3 install selenium
+pip3 install Pillow
 ```
 
 4. Run the following commands in the RPi Terminal to install the libraries needed to drive the E-Ink display. See [this page](https://www.waveshare.com/wiki/12.48inch_e-Paper_Module) for more details.
@@ -49,7 +52,7 @@ sudo pip3 install RPi.GPIO
 sudo pip3 install spidev
 ```
 
-5. Run the following commands in the RPi Terminal to install the web interface for PiSugar2 display. See [this page](https://github.com/PiSugar/PiSugar/wiki/PiSugar2) for more details. After running the command, you would be able to access the web interface at http://<your raspberry ip>:8421 in your browser. From there you should be able specify when you wish to schedule the PiSugar2 boot up your RPi.
+5. Run the following commands in the RPi Terminal to install the web interface for PiSugar2 display. See [this page](https://github.com/PiSugar/PiSugar/wiki/PiSugar2) for more details. After running the command, you would be able to access the web interface at http://your_raspberry_ip:8421 in your browser. From there you should be able specify when you wish to schedule the PiSugar2 boot up your RPi.
 ```bash
 curl http://cdn.pisugar.com/release/Pisugar-power-manager.sh | sudo bash
 ```
@@ -82,6 +85,7 @@ PS: I'm aware that the instructions above may not be complete, especially when i
 ## Acknowledgements
 - [Quattrocento Font](https://fonts.google.com/specimen/Quattrocento): Font used for the calendar display
 - [Bootstrap Calendar CSS](https://bootstrapious.com/p/bootstrap-calendar): Stylesheet that adapted heavily for the calendar display
+- [emagra](https://github.com/emagra): For adding in new features, such as 24hr display and multiple calendar selection. 
 - [/u/aceisace](https://www.reddit.com/user/aceisace/): For the tips on E-Ink development and the [InkyCal](https://github.com/aceisace/Inkycal) repo (worth checking out even though I didn't use it for this project).   
   
 ## Contributing
