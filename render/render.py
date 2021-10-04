@@ -88,33 +88,15 @@ class RenderHelper:
         return blackimg, redimg
 
     def get_day_in_cal(self, startDate, eventDate):
-        delta = eventDate - startDate
-        return delta.days
+        return (eventDate - startDate).days
 
     def get_short_time(self, datetimeObj, is24hour=False):
-        datetimeStr = ''
-        if is24hour:
-            datetimeStr = '{:02d}'.format(datetimeObj.hour) + ':{:02d}'.format(datetimeObj.minute)
-        else:
-            if datetimeObj.minute > 0:
-                datetimeStr = ('.{:02d}').format(datetimeObj.minute)
-
-            if datetimeObj.hour == 0:
-                datetimeStr = '12' + datetimeStr + 'am'
-            elif datetimeObj.hour == 12:
-                datetimeStr = '12' + datetimeStr + 'pm'
-            elif datetimeObj.hour > 12:
-                datetimeStr = str(datetimeObj.hour % 12) + datetimeStr + 'pm'
-            else:
-                datetimeStr = str(datetimeObj.hour) + datetimeStr + 'am'
-        return datetimeStr
+        return datetimeObj.strftime('%H:%M') if is24 else datetimeObj.strftime('%I:%M%p').lower()
 
     def process_inputs(self, calDict):
         # calDict = {'events': eventList, 'calStartDate': calStartDate, 'today': currDate, 'lastRefresh': currDatetime, 'batteryLevel': batteryLevel}
         # first setup list to represent the 5 weeks in our calendar
-        calList = []
-        for i in range(35):
-            calList.append([])
+        calList = [[] for _ in range(35)]
 
         # retrieve calendar configuration
         maxEventsPerDay = calDict['maxEventsPerDay']
@@ -134,8 +116,8 @@ class RenderHelper:
                     calList[idx].append(event)
 
         # Read html template
-        with open(self.currPath + '/calendar_template.html', 'r') as file:
-            calendar_template = file.read()
+        with open(self.currPath + '/calendar_template.html', 'r') as f:
+            calendar_template = f.read()
 
         # Insert month header
         month_name = str(calDict['today'].month)
@@ -206,10 +188,9 @@ class RenderHelper:
             cal_events_text += '</li>\n'
 
         # Append the bottom and write the file
-        htmlFile = open(self.currPath + '/calendar.html', "w")
-        htmlFile.write(calendar_template.format(month=month_name, battText=battText, dayOfWeek=cal_days_of_week,
+        with open(self.currPath + '/calendar.html', "w") as f:
+            f.write(calendar_template.format(month=month_name, battText=battText, dayOfWeek=cal_days_of_week,
                                                 events=cal_events_text))
-        htmlFile.close()
 
         calBlackImage, calRedImage = self.get_screenshot()
 
