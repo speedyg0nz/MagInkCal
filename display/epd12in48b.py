@@ -26,16 +26,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-import time
+from time import clock, sleep
 import display.epdconfig as epdconfig
 
-EPD_WIDTH       = 1304
-EPD_HEIGHT      = 984
+EPD_WIDTH, EPD_HEIGHT = 1304, 984
 
 class EPD(object):
     def __init__(self):
-        self.width = EPD_WIDTH
-        self.height = EPD_HEIGHT
+        self.width, self.height = EPD_WIDTH, EPD_HEIGHT
         
         self.EPD_M1_CS_PIN  = epdconfig.EPD_M1_CS_PIN
         self.EPD_S1_CS_PIN  = epdconfig.EPD_S1_CS_PIN
@@ -150,7 +148,7 @@ class EPD(object):
         self.SetLut()
         
     def display(self, BlackImage, RedImage):
-        start = time.clock()
+        start = clock()
         
         Blackbuf = [0x00] * int(self.width * self.height / 8)
         blackconvert = BlackImage.convert('1')       
@@ -222,13 +220,13 @@ class EPD(object):
             for x in  range(81, 163):
                 self.S1_SendData(~Redbuf[y*163 + x])
                 
-        end = time.clock()
+        end = clock()
         print("use time: %f"%(end - start))
         self.TurnOnDisplay()
 
     def clear(self):
         """Clear contents of image buffer"""
-        start = time.clock()
+        start = clock()
         
         self.S2_SendCommand(0x10)
         for y in  range(0, 492):
@@ -266,7 +264,7 @@ class EPD(object):
             for x in  range(81, 163):
                 self.S1_SendData(0x00)
                 
-        end = time.clock()
+        end = clock()
         print (end)
         print (start)
         print("use time: %f" %(end - start))
@@ -276,27 +274,27 @@ class EPD(object):
     def Reset(self):
         epdconfig.digital_write(self.EPD_M1S1_RST_PIN, 1) 
         epdconfig.digital_write(self.EPD_M2S2_RST_PIN, 1) 
-        time.sleep(0.2) 
+        sleep(0.2) 
         epdconfig.digital_write(self.EPD_M1S1_RST_PIN, 0) 
         epdconfig.digital_write(self.EPD_M2S2_RST_PIN, 0) 
-        time.sleep(0.01) 
+        sleep(0.01) 
         epdconfig.digital_write(self.EPD_M1S1_RST_PIN, 1) 
         epdconfig.digital_write(self.EPD_M2S2_RST_PIN, 1) 
-        time.sleep(0.2) 
+        sleep(0.2) 
     
     def EPD_Sleep(self):
         self.M1S1M2S2_SendCommand(0X02)   	
-        time.sleep(0.3) 
+        sleep(0.3) 
 
         self.M1S1M2S2_SendCommand(0X07)   	
         self.M1S1M2S2_SendData(0xA5) 
-        time.sleep(0.3) 
+        sleep(0.3) 
         print("module_exit")
         epdconfig.module_exit()
 
     def TurnOnDisplay(self):
         self.M1M2_SendCommand(0x04)  
-        time.sleep(0.3) 
+        sleep(0.3) 
         self.M1S1M2S2_SendCommand(0x12) 
         self.M1_ReadBusy()
         self.S1_ReadBusy()
@@ -408,7 +406,7 @@ class EPD(object):
             self.M1_SendCommand(0x71) 
             busy = epdconfig.digital_read(self.EPD_M1_BUSY_PIN) 
             busy = not(busy & 0x01) 
-        time.sleep(0.2)
+        sleep(0.2)
     def M2_ReadBusy(self):
         self.M2_SendCommand(0x71) 
         busy = epdconfig.digital_read(self.EPD_M2_BUSY_PIN) 
@@ -418,7 +416,7 @@ class EPD(object):
             self.M2_SendCommand(0x71) 
             busy = epdconfig.digital_read(self.EPD_M2_BUSY_PIN) 
             busy =not(busy & 0x01) 
-        time.sleep(0.2)
+        sleep(0.2)
     def S1_ReadBusy(self):
         self.S1_SendCommand(0x71) 
         busy = epdconfig.digital_read(self.EPD_S1_BUSY_PIN) 
@@ -427,7 +425,7 @@ class EPD(object):
             self.S1_SendCommand(0x71) 
             busy = epdconfig.digital_read(self.EPD_S1_BUSY_PIN) 
             busy = not(busy & 0x01) 
-        time.sleep(0.2)        
+        sleep(0.2)        
     def S2_ReadBusy(self):
         self.S2_SendCommand(0x71) 
         busy = epdconfig.digital_read(self.EPD_S2_BUSY_PIN) 
@@ -436,7 +434,7 @@ class EPD(object):
             self.S2_SendCommand(0x71) 
             busy = epdconfig.digital_read(self.EPD_S2_BUSY_PIN) 
             busy = not(busy & 0x01) 
-        time.sleep(0.2)            
+        sleep(0.2)            
 
     lut_vcom1 = [
         0x00,	0x10,	0x10,	0x01,	0x08,	0x01,
