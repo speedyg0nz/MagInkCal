@@ -26,9 +26,7 @@ class RenderHelper:
         self.logger = logging.getLogger('maginkcal')
         self.currPath = str(pathlib.Path(__file__).parent.absolute())
         self.htmlFile = 'file://' + self.currPath + '/calendar.html'
-        self.imageWidth = width
-        self.imageHeight = height
-        self.rotateAngle = angle
+        self.imageWidth, self.imageHeight, self.rotateAngle = width, height, angle
         # print(self.htmlFile)
 
     def set_viewport_size(self, driver):
