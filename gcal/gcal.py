@@ -20,8 +20,7 @@ class GcalHelper:
     def __init__(self):
         # Initialise the Google Calendar using the provided credentials and token
         SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-        self.currPath = str(pathlib.Path(__file__).parent.absolute())
-        print(self.currPath)
+        print(self.currPath := str(pathlib.Path(__file__).parent.absolute()))
         creds = None
         # The file token.pickle stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
@@ -71,8 +70,7 @@ class GcalHelper:
         # Call the Google Calendar API and return a list of events that fall within the specified dates
         eventList = []
 
-        minTimeStr = startDatetime.isoformat()
-        maxTimeStr = endDatetime.isoformat()
+        minTimeStr, maxTimeStr = startDatetime.isoformat(), endDatetime.isoformat()
         if False:
             return eventList
 
