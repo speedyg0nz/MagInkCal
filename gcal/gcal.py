@@ -13,15 +13,17 @@ import pathlib
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+import logging
 
 
 class GcalHelper:
 
     def __init__(self):
+        self.logger = logging.getLogger('maginkcal')
         # Initialise the Google Calendar using the provided credentials and token
         SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
         self.currPath = str(pathlib.Path(__file__).parent.absolute())
-        print(self.currPath)
+
         creds = None
         # The file token.pickle stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
@@ -42,6 +44,19 @@ class GcalHelper:
                 pickle.dump(creds, token)
 
         self.service = build('calendar', 'v3', credentials=creds, cache_discovery=False)
+
+    def list_calendars(self):
+        # helps to retrieve ID for calendars within the account
+        # calendar IDs added to config.json will then be queried for retrieval of events
+        self.logger.info('Getting list of calendars')
+        calendars_result = self.service.calendarList().list().execute()
+        calendars = calendars_result.get('items', [])
+        if not calendars:
+            self.logger.info('No calendars found.')
+        for calendar in calendars:
+            summary = calendar['summary']
+            cal_id = calendar['id']
+            self.logger.info("%s\t%s" % (summary, cal_id))
 
     def to_datetime(self, isoDatetime, localTZ):
         # replace Z with +00:00 is a workaround until datetime library decides what to do with the Z notation
@@ -76,7 +91,7 @@ class GcalHelper:
         if False:
             return eventList
 
-        print('Retreiving events between ' + minTimeStr + ' and ' + maxTimeStr + '...')
+        self.logger.info('Retrieving events between ' + minTimeStr + ' and ' + maxTimeStr + '...')
         events_result = []
         for cal in calendars:
             events_result.append(
@@ -91,7 +106,7 @@ class GcalHelper:
             # events = events_result.get('items', [])
 
         if not events:
-            print('No upcoming events found.')
+            self.logger.info('No upcoming events found.')
         for event in events:
             # extracting and converting events data into a new list
             newEvent = {}
@@ -116,4 +131,7 @@ class GcalHelper:
             newEvent['isMultiday'] = self.is_multiday(newEvent['startDatetime'], newEvent['endDatetime'])
             eventList.append(newEvent)
 
+        # We need to sort eventList because the event will be sorted in "calendar order" instead of hours order
+        # TODO: improve because of double cycle for now is not much cost
+        eventList = sorted(eventList, key=lambda k: k['startDatetime'])
         return eventList

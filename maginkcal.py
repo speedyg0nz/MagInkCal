@@ -9,6 +9,8 @@ There will also be work needed to adjust the calendar rendering for different sc
 CSS stylesheets in the "render" folder.
 """
 import datetime as dt
+import sys
+
 from pytz import timezone
 from gcal.gcal import GcalHelper
 from render.render import RenderHelper
@@ -41,6 +43,7 @@ def main():
     # Create and configure logger
     logging.basicConfig(filename="logfile.log", format='%(asctime)s %(levelname)s - %(message)s', filemode='a')
     logger = logging.getLogger('maginkcal')
+    logger.addHandler(logging.StreamHandler(sys.stdout))  # print logger to stdout
     logger.setLevel(logging.INFO)
     logger.info("Starting daily calendar update")
 
@@ -63,9 +66,10 @@ def main():
         calEndDatetime = displayTZ.localize(dt.datetime.combine(calEndDate, dt.datetime.max.time()))
 
         # Using Google Calendar to retrieve all events within start and end date (inclusive)
+        start = dt.datetime.now()
         gcalService = GcalHelper()
         eventList = gcalService.retrieve_events(calendars, calStartDatetime, calEndDatetime, displayTZ, thresholdHours)
-        logger.info("Calendar events retrieved")
+        logger.info("Calendar events retrieved in " + str(dt.datetime.now() - start))
 
         # Populate dictionary with information to be rendered on e-ink display
         calDict = {'events': eventList, 'calStartDate': calStartDate, 'today': currDate, 'lastRefresh': currDatetime,
@@ -89,7 +93,6 @@ def main():
         logger.info('Battery level at end: {:.3f}'.format(currBatteryLevel))
 
     except Exception as e:
-        print(str(e))
         logger.error(e)
 
     logger.info("Completed daily calendar update")
