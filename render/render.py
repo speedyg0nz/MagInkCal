@@ -29,7 +29,6 @@ class RenderHelper:
         self.imageWidth = width
         self.imageHeight = height
         self.rotateAngle = angle
-        # print(self.htmlFile)
 
     def set_viewport_size(self, driver):
 
@@ -64,25 +63,22 @@ class RenderHelper:
         self.logger.info('Screenshot captured and saved to file.')
 
         redimg = Image.open(self.currPath + '/calendar.png')  # get image)
-        pixels = redimg.load()  # create the pixel map
-
-        for i in range(redimg.size[0]):  # for every pixel:
-            for j in range(redimg.size[1]):
-                if pixels[i, j][0] <= pixels[i, j][1] and pixels[i, j][0] <= pixels[i, j][2]:  # if is red
-                    pixels[i, j] = (255, 255, 255)  # change to white
-        redimg = redimg.rotate(self.rotateAngle, expand=True)
-
+        rpixels = redimg.load()  # create the pixel map
         blackimg = Image.open(self.currPath + '/calendar.png')  # get image)
-        pixels = blackimg.load()  # create the pixel map
+        bpixels = blackimg.load()  # create the pixel map
 
-        for i in range(blackimg.size[0]):  # for every pixel:
-            for j in range(blackimg.size[1]):
-                if pixels[i, j][0] > pixels[i, j][1] and pixels[i, j][0] > pixels[i, j][2]:  # if is red
-                    pixels[i, j] = (255, 255, 255)  # change to white
+        for i in range(redimg.size[0]):  # loop through every pixel in the image
+            for j in range(redimg.size[1]): # since both bitmaps are identical, cycle only once and not both bitmaps
+                if rpixels[i, j][0] <= rpixels[i, j][1] and rpixels[i, j][0] <= rpixels[i, j][2]:  # if is not red
+                    rpixels[i, j] = (255, 255, 255)  # change it to white in the red image bitmap
+
+                elif bpixels[i, j][0] > bpixels[i, j][1] and bpixels[i, j][0] > bpixels[i, j][2]:  # if is red
+                    bpixels[i, j] = (255, 255, 255)  # change to white in the black image bitmap
+
+        redimg = redimg.rotate(self.rotateAngle, expand=True)
         blackimg = blackimg.rotate(self.rotateAngle, expand=True)
 
         self.logger.info('Image colours processed. Extracted grayscale and red images.')
-
         return blackimg, redimg
 
     def get_day_in_cal(self, startDate, eventDate):
