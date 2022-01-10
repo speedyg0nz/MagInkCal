@@ -39,6 +39,7 @@ def main():
     rotateAngle = config['rotateAngle']  # If image is rendered in portrait orientation, angle to rotate to fit screen
     calendars = config['calendars']  # Google calendar ids
     is24hour = config['is24h']  # set 24 hour time
+    isMonthAbbr = config['isMonthAbbr'] # Use month abbreviation like 'JAN' instead of month number '1'
 
     # Create and configure logger
     logging.basicConfig(filename="logfile.log", format='%(asctime)s %(levelname)s - %(message)s', filemode='a')
@@ -75,7 +76,7 @@ def main():
         calDict = {'events': eventList, 'calStartDate': calStartDate, 'today': currDate, 'lastRefresh': currDatetime,
                    'batteryLevel': currBatteryLevel, 'batteryDisplayMode': batteryDisplayMode,
                    'dayOfWeekText': dayOfWeekText, 'weekStartDay': weekStartDay, 'maxEventsPerDay': maxEventsPerDay,
-                   'is24hour': is24hour}
+                   'is24hour': is24hour, 'isMonthAbbr': isMonthAbbr}
 
         renderService = RenderHelper(imageWidth, imageHeight, rotateAngle)
         calBlackImage, calRedImage = renderService.process_inputs(calDict)

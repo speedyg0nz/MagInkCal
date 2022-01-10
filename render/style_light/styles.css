@@ -1,0 +1,260 @@
+/*
+*
+* ==========================================
+* CUSTOM UTIL CLASSES
+* ==========================================
+*
+*/
+.clearfix::after,
+
+:root {
+    --red: #dc3545;
+    --white: #fff;
+    --gray: #6c757d;
+    --gray-dark: #343a40;
+}
+
+.text-uppercase {
+    text-transform: uppercase!important;
+}
+
+.mb-0, .my-0 {
+    margin-top: 0;
+    margin-bottom: 0!important;
+}
+
+.p-3 {
+    padding: 1rem!important;
+}
+
+.text-center {
+    text-align: center!important;
+}
+
+.list-unstyled {
+    padding-left: 0;
+    list-style: none;
+}
+
+.font-weight-bold {
+    font-weight: 700!important;
+}
+
+.text-muted {
+    color: #6c757d!important;
+}
+
+dl, ol, ul {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    background-color: #fff;
+}
+
+@font-face {
+    font-family: "Quattrocento-Bold";
+    src: url('Quattrocento-Bold.ttf');
+}
+
+@font-face {
+    font-family: "Quattrocento-Regular";
+    src: url('Quattrocento-Regular.ttf');
+}
+
+.container {
+    width: 100%;
+    padding: 0!important;
+    margin: 0!important;
+    max-width: 984px;
+    height: 1304px;
+}
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+.calendar ol::after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+/* ================
+Calendar Styling */
+.calendar {
+  border-radius: 0px;
+}
+
+.month {
+  font-size: 13rem;
+  font-family: "Quattrocento-Regular";
+}
+
+@media (min-width: 992px) {
+  .month {
+    font-size: 13rem;
+    line-height: 13rem;
+    font-family: "Quattrocento-Regular";
+  }
+}
+
+.calendar ol li {
+  float: left;
+  width: 14.28571%;
+}
+
+.calendar .day-names {
+  font-size: 3.5rem;
+  line-height: 1.2;
+  font-family: "Quattrocento-Regular";
+}
+
+.calendar .day-names li {
+  text-transform: uppercase;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.calendar .days li {
+  /* min-height: 12rem; */
+  min-height: 11.5rem;
+}
+
+.calendar .days li .date {
+  margin: 0.5rem 0;
+  line-height: 1.0;
+}
+
+.calendar .date {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: bold;
+  font-family: "Quattrocento-Regular";
+}
+
+.datecirclebox {
+    position: relative;
+}
+
+.datecircle {
+    margin: 0rem auto;
+    width:4rem;
+    height:4rem;
+    border-radius:2rem;
+    font-family: "Quattrocento-Regular";
+    font-size:3rem;
+    color:white;
+    line-height: 4rem;
+    text-align:center;
+    vertical-align: middle;
+    background:#ff0000;
+}
+
+.calendar .days li .event {
+  font-size: 1rem;
+  /* font-weight: bold;*/
+  padding: 0.1rem;
+  /* color: black; */
+  /* font-family: "Judson-Regular";*/
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 0rem;
+  margin-bottom: 1px;
+}
+
+.calendar .days li .event.span-2 {
+  width: 200%;
+}
+
+.text-multiday {
+  text-overflow: '...」'!important;
+}
+
+.calendar .days li .event.begin {
+  border-radius: 1rem 0 0 1rem;
+}
+
+.calendar .days li .event.end {
+  border-radius: 0 1rem 1rem 0;
+}
+
+.calendar .days li .event.clear {
+  background: none;
+}
+
+.calendar .days li:nth-child(n+29) {
+  border-bottom: none;
+}
+
+.calendar .days li.outside .date {
+  color: #ddd;
+}
+
+div.batt_container {
+  width: 53px;
+  height: 27px;
+  position: absolute;
+  top: 5;
+  left: 925;
+  overflow: hidden;
+}
+
+div.batt_container  {
+  z-index: 10;
+}
+
+div.batt_container .battery80 {
+  position: relative;
+  left: 0px;
+  top: 0px;
+}
+
+div.batt_container .battery60 {
+  position: relative;
+  left: 0px;
+  top: -44px;
+}
+
+div.batt_container .battery40 {
+  position: relative;
+  left: 0px;
+  top: -89px;
+}
+
+div.batt_container .battery20 {
+  position: relative;
+  left: 0px;
+  top: -134px;
+}
+
+div.batt_container .battery0 {
+  position: relative;
+  left: 0px;
+  top: -178px;
+}
+
+div.batt_container .batteryHide {
+    display: none;
+}
+
+/*
+*
+* ==========================================
+* FOR DEMO PURPOSES
+* ==========================================
+*
+*/
+body {
+  min-height: 100vh;
+  background-color: #ffffff;
+}
