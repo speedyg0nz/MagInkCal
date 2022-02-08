@@ -13,6 +13,7 @@ import sys
 
 from pytz import timezone
 from gcal.gcal import GcalHelper
+from caldav.caldav import CaldavHelper
 from render.render import RenderHelper
 from power.power import PowerHelper
 import json
@@ -24,6 +25,7 @@ def main():
     configFile = open('config.json')
     config = json.load(configFile)
 
+    calendarSource = config['calendarSource'] # Type of calendar source - either gcal or caldav
     displayTZ = timezone(config['displayTZ']) # list of timezones - print(pytz.all_timezones)
     thresholdHours = config['thresholdHours']  # considers events updated within last 12 hours as recently updated
     maxEventsPerDay = config['maxEventsPerDay']  # limits number of events to display (remainder displayed as '+X more')
@@ -67,8 +69,11 @@ def main():
 
         # Using Google Calendar to retrieve all events within start and end date (inclusive)
         start = dt.datetime.now()
-        gcalService = GcalHelper()
-        eventList = gcalService.retrieve_events(calendars, calStartDatetime, calEndDatetime, displayTZ, thresholdHours)
+        if calendarSource == "gcal":
+            calService = GcalHelper()
+        elif calendarSource == "caldav":
+            calService = CaldavHelper()
+        eventList = calService.retrieve_events(calendars, calStartDatetime, calEndDatetime, displayTZ, thresholdHours)
         logger.info("Calendar events retrieved in " + str(dt.datetime.now() - start))
 
         # Populate dictionary with information to be rendered on e-ink display
