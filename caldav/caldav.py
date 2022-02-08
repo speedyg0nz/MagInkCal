@@ -12,7 +12,7 @@ import pathlib
 import logging
 import caldav
 
-class NextcloudHelper:
+class CaldavHelper:
 
     def __init__(self):
         self.logger = logging.getLogger('maginkcal')
