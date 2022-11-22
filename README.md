@@ -9,8 +9,10 @@ Back in 2019, I [started a thread in Reddit](https://www.reddit.com/r/RASPBERRY_
 
 ## Hardware Required
 - [Raspberry Pi Zero WH](https://www.raspberrypi.org/blog/zero-wh/) - Header pins are needed to connect to the E-Ink display
-- [Waveshare 12.48" Tri-color E-Ink Display](https://www.waveshare.com/product/12.48inch-e-paper-module-b.htm) - Unfortunately out of stock at the time this is published
+- [Waveshare 12.48" Tri-color E-Ink Display](https://www.waveshare.com/product/12.48inch-e-paper-module-b.htm) - Unfortunately out of stock at the time this was published in September 2021
 - [PiSugar2 for Raspberry Pi Zero](https://www.pisugar.com/) ([Tindie](https://www.tindie.com/products/pisugar/pisugar2-battery-for-raspberry-pi-zero/)) - Provides the RTC and battery for this project
+
+**Update (22 Nov 2022)**: Looks like the 12.48" E-Ink Display is finally back in stock over at Waveshare! And a [new version of the PiSugar](https://www.tindie.com/products/pisugar/pisugar3-battery-for-raspberry-pi-zero/) with USB-C port has been released over the past year as well.
 
 ## How It Works
 Through PiSugar2's web interface, the onboard RTC can be set to wake and trigger the RPi to boot up daily at a time of your preference. Upon boot, a cronjob on the RPi is triggered to run a Python script that fetches calendar events from Google Calendar for the next few weeks, and formats them into the desired layout before displaying it on the E-Ink display. The RPi then shuts down to conserve battery. The calendar remains displayed on the E-Ink screen, because well, E-Ink...
@@ -90,6 +92,12 @@ PS: I'm aware that the instructions above may not be complete, especially when i
   
 ## Contributing
 I won't be updating this code much, since it has been serving me well. Nevertheless, feel free to fork the repo and modify it for your own purpose. At the same time, check out other similar projects, such as [InkyCal](https://github.com/aceisace/Inkycal). It's much more polished and also actively developed.
+
+## Buy Me A Coffee
+If this project has helped you in any way, do consider buying me a coffee!
+
+<a href="https://www.buymeacoffee.com/speedygonz" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 
 ## What's Next
 Honestly, the cost of this project is way too high for a single purpose device. Personally, I've been looking at E-Ink tablets that emulate the experience of writing on paper, and allow the users to take notes on the go. Those familiar with this range of products would be aware of the reMarkable tablet, Ratta Supernote, Kobo Elipsa and many others. My next project is likely to enhance one of these devices such that the calendar will be displayed when it's not in use. While this is usually possible by manually setting the sleep screen image / screensaver, I'm looking to have the screensaver updated automatically on a daily basis, like how it was done in this project.
