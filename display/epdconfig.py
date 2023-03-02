@@ -60,7 +60,12 @@ find_dirs = [
 ]
 spi = None
 for find_dir in find_dirs:
-    so_filename = os.path.join(find_dir, 'DEV_Config.so')
+    val = int(os.popen('getconf LONG_BIT').read())
+    logging.debug("System is %d bit"%val)
+    if val == 64:
+        so_filename = os.path.join(find_dir, 'DEV_Config_64.so')
+    else:
+        so_filename = os.path.join(find_dir, 'DEV_Config_32.so')
     if os.path.exists(so_filename):
         spi = CDLL(so_filename)
         break
@@ -86,7 +91,7 @@ def module_init():
     GPIO.setup(EPD_SCK_PIN, GPIO.OUT)    
     GPIO.setup(EPD_MOSI_PIN, GPIO.OUT)
     
-    logging.debug("python call wiringPi Lib")
+    logging.debug("python call bcm2835 Lib")
     
     GPIO.setup(EPD_M2S2_RST_PIN, GPIO.OUT)    
     GPIO.setup(EPD_M1S1_RST_PIN, GPIO.OUT)
