@@ -13,6 +13,7 @@ RPi device, while using a ESP32 or PiZero purely to just retrieve the image from
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from time import sleep
 from datetime import timedelta
 import pathlib
@@ -36,7 +37,7 @@ class RenderHelper:
         current_window_size = driver.get_window_size()
 
         # Extract the client window size from the html tag
-        html = driver.find_element_by_tag_name('html')
+        html = driver.find_element(By.TAG_NAME,'html')
         inner_width = int(html.get_attribute("clientWidth"))
         inner_height = int(html.get_attribute("clientHeight"))
 
