@@ -28,7 +28,7 @@ Some features of the calendar:
 
 ## Setting Up Raspberry Pi Zero
 
-1. Start by flashing [Raspberrypi OS Lite](https://www.raspberrypi.org/software/operating-systems/) to a MicroSD Card.
+1. Start by flashing [Raspberrypi OS Lite](https://www.raspberrypi.org/software/operating-systems/) to a MicroSD Card. (March 2023 Edit: If you're still using the original Raspbeery Pi Zero, there are [known issues](https://forums.raspberrypi.com/viewtopic.php?t=323478) between the latest RPiOS "bullseye" release and chromium-browser, which is required to run this code. As such, I would recommend that you keep to the legacy "buster" OS if you're still running this on older RPiO hardware.)
 
 2. After setting up the OS, run the following commmand in the RPi Terminal, and use the [raspi-config](https://www.raspberrypi.org/documentation/computers/configuration.html) interface to setup Wifi connection, enable SSH, I2C, SPI, and set the timezone to your location.
 
@@ -41,6 +41,7 @@ sudo raspi-config
 sudo apt update
 sudo apt-get install python3-pip
 sudo apt-get install chromium-chromedriver
+sudo apt-get install libopenjp2-7-dev
 pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
 pip3 install pytz
 pip3 install selenium
@@ -52,6 +53,7 @@ pip3 install Pillow
 sudo apt-get install python3-pil
 sudo pip3 install RPi.GPIO
 sudo pip3 install spidev
+sudo apt-get install wiringpi
 ```
 
 5. Run the following commands in the RPi Terminal to install the web interface for PiSugar2 display. See [this page](https://github.com/PiSugar/PiSugar/wiki/PiSugar2) for more details. After running the command, you would be able to access the web interface at http://your_raspberry_ip:8421 in your browser. From there you should be able to specify when you wish to schedule the PiSugar2 boot up your RPi.
