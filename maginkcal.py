@@ -66,10 +66,10 @@ def main():
         calEndDatetime = displayTZ.localize(dt.datetime.combine(calEndDate, dt.datetime.max.time()))
 
         # Using Google Calendar to retrieve all events within start and end date (inclusive)
-        start = dt.datetime.now()
+        start = dt.datetime.now(displayTZ)
         gcalService = GcalHelper()
         eventList = gcalService.retrieve_events(calendars, calStartDatetime, calEndDatetime, displayTZ, thresholdHours)
-        logger.info("Calendar events retrieved in " + str(dt.datetime.now() - start))
+        logger.info("Calendar events retrieved in " + str(dt.datetime.now(displayTZ) - start))
 
         # Populate dictionary with information to be rendered on e-ink display
         calDict = {'events': eventList, 'calStartDate': calStartDate, 'today': currDate, 'lastRefresh': currDatetime,
