@@ -157,6 +157,8 @@ if __name__ == "__main__":
     try:
         sched.start()
     except (KeyboardInterrupt, SystemExit):
+        logger.info("Stop calendar services!")
         displayService.epd.clear()
         displayService.sleep()
+        logger.info("Stop calendar service complete!")
         exit()
