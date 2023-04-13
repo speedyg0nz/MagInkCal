@@ -9,8 +9,6 @@ There will also be work needed to adjust the calendar rendering for different sc
 CSS stylesheets in the "render" folder.
 """
 import datetime as dt
-import time
-import sys
 
 from pytz import timezone
 from gcal.gcal import GcalHelper
@@ -161,3 +159,4 @@ if __name__ == "__main__":
     except (KeyboardInterrupt, SystemExit):
         displayService.epd.clear()
         displayService.sleep()
+        exit()
