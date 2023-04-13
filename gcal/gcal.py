@@ -134,4 +134,8 @@ class GcalHelper:
         # We need to sort eventList because the event will be sorted in "calendar order" instead of hours order
         # TODO: improve because of double cycle for now is not much cost
         eventList = sorted(eventList, key=lambda k: k['startDatetime'])
+        self.events = eventList
         return eventList
+    
+    def get_events(self):
+        return self.events
