@@ -1,4 +1,5 @@
 {
+  "calendarSource": "gcal",
   "displayTZ": "Asia/Hong_Kong",
   "thresholdHours": 24,
   "maxEventsPerDay": 3,

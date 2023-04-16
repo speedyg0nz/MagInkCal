@@ -2,6 +2,9 @@
 gcal/credentials.json
 gcal/token.pickle
 
+# Caldav Credential file
+caldav/credentials.json
+
 # Intermediate render files
 render/calendar.html
 render/calendar.png
