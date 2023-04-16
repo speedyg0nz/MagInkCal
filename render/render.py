@@ -117,6 +117,7 @@ class RenderHelper:
         dayOfWeekText = calDict['dayOfWeekText']
         weekStartDay = calDict['weekStartDay']
         is24hour = calDict['is24hour']
+        isMonthAbbr = calDict['isMonthAbbr']
 
         # for each item in the eventList, add them to the relevant day in our calendar list
         for event in calDict['events']:
@@ -133,7 +134,10 @@ class RenderHelper:
             calendar_template = file.read()
 
         # Insert month header
-        month_name = str(calDict['today'].month)
+        if isMonthAbbr:
+            month_name = calendar.month_abbr[calDict['today'].month]
+        else:
+            month_name = str(calDict['today'].month)
 
         # Insert battery icon
         # batteryDisplayMode - 0: do not show / 1: always show / 2: show when battery is low

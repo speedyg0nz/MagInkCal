@@ -23,6 +23,7 @@ Some features of the calendar:
 - I don't like having long bars that span across multiple days for multi-day events, so I chose to display only the start and end dates for those events, and adding small left/right arrows accordingly,
 - Given limited space (oh why are large E-Ink screens still so expensive!) and resolution on the display, I could only show 3 events per day and an indicator (e.g. 4 more) for those not displayed 
 - The calendar always starts from the current week, and displays the next four (total 35 days). If the dates cross over to the new month, it's displayed in grey instead of black.
+- There are two different styles of the calendar: Light and dark
 
 ![MagInkCal Basics](https://user-images.githubusercontent.com/5581989/134775456-d6bacaca-03c7-4357-af28-7c06aa19ed90.png)
 
@@ -85,6 +86,11 @@ crontab -e
 12. That's all! Your Magic Calendar should now be refreshed at the time interval that you specified in the PiSugar2 web interface! 
 
 PS: I'm aware that the instructions above may not be complete, especially when it comes to the Python libraries to be installed, so feel free to ping me if you noticed anything missing and I'll add it to the steps above.
+
+## Themes ##
+
+There are two different styles of the calendar: Light and dark.
+Just copy the files (.css/.png) out of `render/stlye_light`-folder or `render/style_dark`-folder and replace the existing in `render`-folder to switch between a dark and a light style of the calendar.
 
 ## Acknowledgements
 - [Quattrocento Font](https://fonts.google.com/specimen/Quattrocento): Font used for the calendar display
