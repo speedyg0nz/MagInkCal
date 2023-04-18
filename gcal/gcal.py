@@ -20,32 +20,15 @@ class GcalHelper:
 
     def __init__(self):
         self.logger = logging.getLogger('maginkcal')
-        # Initialise the Google Calendar using the provided credentials and token
-        SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-        self.currPath = str(pathlib.Path(__file__).parent.absolute())
-
-        creds = None
-        # The file token.pickle stores the user's access and refresh tokens, and is
-        # created automatically when the authorization flow completes for the first
-        # time.
-        if os.path.exists(self.currPath + '/token.pickle'):
-            with open(self.currPath + '/token.pickle', 'rb') as token:
-                creds = pickle.load(token)
-        # If there are no (valid) credentials available, let the user log in.
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    self.currPath + '/credentials.json', SCOPES)
-                creds = flow.run_local_server(port=0)
-            # Save the credentials for the next run
-            with open(self.currPath + '/token.pickle', 'wb') as token:
-                pickle.dump(creds, token)
-
-        self.service = build('calendar', 'v3', credentials=creds, cache_discovery=False)
+        self.update_cred()
+        self.register_service()
 
     def list_calendars(self):
+        if not self.creds or not self.creds.valid:
+            self.logger.info('credentials isan\'t valid. update credntials.')
+            self.update_cred()
+            self.register_service()
+
         # helps to retrieve ID for calendars within the account
         # calendar IDs added to config.json will then be queried for retrieval of events
         self.logger.info('Getting list of calendars')
@@ -139,3 +122,30 @@ class GcalHelper:
     
     def get_events(self):
         return self.events
+
+    def update_cred(self):
+        # Initialise the Google Calendar using the provided credentials and token
+        SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+        self.currPath = str(pathlib.Path(__file__).parent.absolute())
+
+        self.creds = None
+        # The file token.pickle stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first
+        # time.
+        if os.path.exists(self.currPath + '/token.pickle'):
+            with open(self.currPath + '/token.pickle', 'rb') as token:
+                self.creds = pickle.load(token)
+        # If there are no (valid) credentials available, let the user log in.
+        if not self.creds or not self.creds.valid:
+            if self.creds and self.creds.expired and self.creds.refresh_token:
+                self.creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    self.currPath + '/credentials.json', SCOPES)
+                self.creds = flow.run_local_server(port=0)
+            # Save the credentials for the next run
+            with open(self.currPath + '/token.pickle', 'wb') as token:
+                pickle.dump(self.creds, token)
+
+    def register_service(self):
+        self.service = build('calendar', 'v3', credentials=self.creds, cache_discovery=False)
