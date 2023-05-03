@@ -69,6 +69,10 @@ class GcalHelper:
         # Call the Google Calendar API and return a list of events that fall within the specified dates
         eventList = []
 
+        # Before call the GCalAPI, update credentials.
+        self.update_cred()
+        self.register_service()
+
         minTimeStr = startDatetime.isoformat()
         maxTimeStr = endDatetime.isoformat()
         if False:

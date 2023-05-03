@@ -144,13 +144,13 @@ if __name__ == "__main__":
 
     sched.add_job(lambda: displayCalendar(logger, displayService, renderService, gcalService),
         CronTrigger.from_crontab(
-            "4,9,14,19,24,29,34,39,44,49,54,59 * * * *"
+            "0,15,30,45 * * * *"
         ),
         id='display'
     )
     sched.add_job(lambda: syncCalendar(logger, gcalService),
         CronTrigger.from_crontab(
-            "2,7,12,17,22,27,32,37,42,47,52,57 * * * *"
+            "10,25,40,55 * * * *"
         ),
         id="event_sync"
     )
