@@ -21,13 +21,10 @@ class GcalHelper:
     def __init__(self):
         self.logger = logging.getLogger('maginkcal')
         self.update_cred()
-        self.register_service()
 
     def list_calendars(self):
         if not self.creds or not self.creds.valid:
             self.logger.info('credentials isan\'t valid. update credntials.')
-            self.update_cred()
-            self.register_service()
 
         # helps to retrieve ID for calendars within the account
         # calendar IDs added to config.json will then be queried for retrieval of events
@@ -141,15 +138,20 @@ class GcalHelper:
                 self.creds = pickle.load(token)
         # If there are no (valid) credentials available, let the user log in.
         if not self.creds or not self.creds.valid:
-            if self.creds and self.creds.expired and self.creds.refresh_token:
-                self.creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    self.currPath + '/credentials.json', SCOPES)
-                self.creds = flow.run_local_server(port=0)
-            # Save the credentials for the next run
-            with open(self.currPath + '/token.pickle', 'wb') as token:
-                pickle.dump(self.creds, token)
+            try:
+                if self.creds and self.creds.expired and self.creds.refresh_token:
+                    self.creds.refresh(Request())
+                else:
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        self.currPath + '/credentials.json', SCOPES)
+                    self.creds = flow.run_local_server(port=0)
+                # Save the credentials for the next run
+                with open(self.currPath + '/token.pickle', 'wb') as token:
+                    pickle.dump(self.creds, token)
+                self.register_service()
+            except Exception as e:
+                self.logger.info(e)
+                raise e
 
     def register_service(self):
         self.service = build('calendar', 'v3', credentials=self.creds, cache_discovery=False)

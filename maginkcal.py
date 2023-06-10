@@ -117,6 +117,13 @@ def syncCalendar(logger, gcalService):
 
     return
 
+def syncAccount(logger, gcalService):
+    logger.info("Account sync start!")
+    gcalService.update_cred()
+    logger.info("Account sync end!")
+
+    return
+
 if __name__ == "__main__":
     # Create and configure logger
     logging.basicConfig(filename="logfile.log", format='%(asctime)s %(levelname)s - %(message)s', filemode='a')
@@ -139,6 +146,7 @@ if __name__ == "__main__":
     renderService = RenderHelper(imageWidth, imageHeight, rotateAngle)
     gcalService = GcalHelper()
 
+    syncAccount(logger, gcalService)
     syncCalendar(logger, gcalService)
     displayCalendar(logger, displayService, renderService, gcalService)
 
@@ -153,6 +161,12 @@ if __name__ == "__main__":
             "10,25,40,55 * * * *"
         ),
         id="event_sync"
+    )
+    sched.add_job(lambda: syncAccount(logger, gcalService),
+        CronTrigger.from_crontab(
+            "0 0,12 * * *"
+        ),
+        id="account_sync"
     )
 
     try:
