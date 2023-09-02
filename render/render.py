@@ -14,8 +14,9 @@ RPi device, while using a ESP32 or PiZero purely to just retrieve the image from
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.service import Service as ChromiumService
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
 from time import sleep
 from datetime import timedelta
 import pathlib
@@ -56,7 +57,10 @@ class RenderHelper:
         opts.add_argument("--headless")
         opts.add_argument("--hide-scrollbars");
         opts.add_argument('--force-device-scale-factor=1')
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=opts)
+        driver = webdriver.Chrome(service=ChromiumService(
+            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+        ), options=opts)
+        
         self.set_viewport_size(driver)
         driver.get(self.htmlFile)
         sleep(1)
