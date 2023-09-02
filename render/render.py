@@ -50,12 +50,13 @@ class RenderHelper:
 
         driver.set_window_rect(
             width=target_width,
-            height=target_height)
+            height=target_height
+        )
 
     def get_screenshot(self):
         opts = Options()
-        opts.add_argument("--headless")
-        opts.add_argument("--hide-scrollbars");
+        opts.add_argument("--headless=new")
+        opts.add_argument("--hide-scrollbars")
         opts.add_argument('--force-device-scale-factor=1')
         driver = webdriver.Chrome(service=ChromiumService(
             ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
