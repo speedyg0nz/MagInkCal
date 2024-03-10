@@ -9,17 +9,18 @@ There will also be work needed to adjust the calendar rendering for different sc
 CSS stylesheets in the "render" folder.
 """
 import datetime as dt
-import sys
 
 from pytz import timezone
 from gcal.gcal import GcalHelper
 from render.render import RenderHelper
 from power.power import PowerHelper
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.triggers.cron import CronTrigger
 import json
 import logging
+import sys
 
-
-def main():
+def config():
     # Basic configuration settings (user replaceable)
     configFile = open('config.json')
     config = json.load(configFile)
@@ -40,18 +41,25 @@ def main():
     calendars = config['calendars']  # Google calendar ids
     is24hour = config['is24h']  # set 24 hour time
 
-    # Create and configure logger
-    logging.basicConfig(filename="logfile.log", format='%(asctime)s %(levelname)s - %(message)s', filemode='a')
-    logger = logging.getLogger('maginkcal')
-    logger.addHandler(logging.StreamHandler(sys.stdout))  # print logger to stdout
-    logger.setLevel(logging.INFO)
-    logger.info("Starting daily calendar update")
+    return displayTZ, thresholdHours, maxEventsPerDay, isDisplayToScreen, \
+        isShutdownOnComplete, batteryDisplayMode, weekStartDay, dayOfWeekText, \
+        screenWidth, screenHeight, imageWidth, imageHeight, rotateAngle, \
+        calendars, is24hour
 
+def displayCalendar(logger, displayService, renderService, gcalService):
     try:
         # Establish current date and time information
         # Note: For Python datetime.weekday() - Monday = 0, Sunday = 6
         # For this implementation, each week starts on a Sunday and the calendar begins on the nearest elapsed Sunday
         # The calendar will also display 5 weeks of events to cover the upcoming month, ending on a Saturday
+
+        displayTZ, thresholdHours, maxEventsPerDay, isDisplayToScreen, \
+        isShutdownOnComplete, batteryDisplayMode, weekStartDay, dayOfWeekText, \
+        screenWidth, screenHeight, imageWidth, imageHeight, rotateAngle, \
+        calendars, is24hour = config()
+
+        logger.info("Calendar display start!")
+
         powerService = PowerHelper()
         powerService.sync_time()
         currBatteryLevel = powerService.get_battery()
@@ -61,33 +69,19 @@ def main():
         logger.info("Time synchronised to {}".format(currDatetime))
         currDate = currDatetime.date()
         calStartDate = currDate - dt.timedelta(days=((currDate.weekday() + (7 - weekStartDay)) % 7))
-        calEndDate = calStartDate + dt.timedelta(days=(5 * 7 - 1))
-        calStartDatetime = displayTZ.localize(dt.datetime.combine(calStartDate, dt.datetime.min.time()))
-        calEndDatetime = displayTZ.localize(dt.datetime.combine(calEndDate, dt.datetime.max.time()))
-
-        # Using Google Calendar to retrieve all events within start and end date (inclusive)
-        start = dt.datetime.now()
-        gcalService = GcalHelper()
-        eventList = gcalService.retrieve_events(calendars, calStartDatetime, calEndDatetime, displayTZ, thresholdHours)
-        logger.info("Calendar events retrieved in " + str(dt.datetime.now() - start))
-
         # Populate dictionary with information to be rendered on e-ink display
-        calDict = {'events': eventList, 'calStartDate': calStartDate, 'today': currDate, 'lastRefresh': currDatetime,
+        calDict = {'events': gcalService.get_events(), 'calStartDate': calStartDate, 'today': currDate, 'lastRefresh': currDatetime,
                    'batteryLevel': currBatteryLevel, 'batteryDisplayMode': batteryDisplayMode,
                    'dayOfWeekText': dayOfWeekText, 'weekStartDay': weekStartDay, 'maxEventsPerDay': maxEventsPerDay,
                    'is24hour': is24hour}
 
-        renderService = RenderHelper(imageWidth, imageHeight, rotateAngle)
         calBlackImage, calRedImage = renderService.process_inputs(calDict)
 
         if isDisplayToScreen:
-            from display.display import DisplayHelper
-            displayService = DisplayHelper(screenWidth, screenHeight)
             if currDate.weekday() == weekStartDay:
                 # calibrate display once a week to prevent ghosting
                 displayService.calibrate(cycles=0)  # to calibrate in production
             displayService.update(calBlackImage, calRedImage)
-            displayService.sleep()
 
         currBatteryLevel = powerService.get_battery()
         logger.info('Battery level at end: {:.3f}'.format(currBatteryLevel))
@@ -95,18 +89,91 @@ def main():
     except Exception as e:
         logger.error(e)
 
-    logger.info("Completed daily calendar update")
+    logger.info("Completed calendar update")
+    return
 
-    logger.info("Checking if configured to shutdown safely - Current hour: {}".format(currDatetime.hour))
-    if isShutdownOnComplete:
-        # implementing a failsafe so that we don't shutdown when debugging
-        # checking if it's 6am in the morning, which is the time I've set PiSugar to wake and refresh the calendar
-        # if it is 6am, shutdown the RPi. if not 6am, assume I'm debugging the code, so do not shutdown
-        if currDatetime.hour == 6:
-            logger.info("Shutting down safely.")
-            import os
-            os.system("sudo shutdown -h now")
+def syncCalendar(logger, gcalService):
+    displayTZ, thresholdHours, maxEventsPerDay, isDisplayToScreen, \
+    isShutdownOnComplete, batteryDisplayMode, weekStartDay, dayOfWeekText, \
+    screenWidth, screenHeight, imageWidth, imageHeight, rotateAngle, \
+    calendars, is24hour = config()
+    global eventList
 
+    logger.info("Calendar sync start!")
+
+    currDatetime = dt.datetime.now(displayTZ)
+    logger.info("Time synchronised to {}".format(currDatetime))
+    currDate = currDatetime.date()
+    calStartDate = currDate - dt.timedelta(days=((currDate.weekday() + (7 - weekStartDay)) % 7))
+    calEndDate = calStartDate + dt.timedelta(days=(5 * 7 - 1))
+    calStartDatetime = displayTZ.localize(dt.datetime.combine(calStartDate, dt.datetime.min.time()))
+    calEndDatetime = displayTZ.localize(dt.datetime.combine(calEndDate, dt.datetime.max.time()))
+
+    # Using Google Calendar to retrieve all events within start and end date (inclusive)
+    start = dt.datetime.now(displayTZ)
+
+    eventList = gcalService.retrieve_events(calendars, calStartDatetime, calEndDatetime, displayTZ, thresholdHours)
+    logger.info("Calendar events retrieved in " + str(dt.datetime.now(displayTZ) - start))
+
+    return
+
+def syncAccount(logger, gcalService):
+    logger.info("Account sync start!")
+    gcalService.update_cred()
+    logger.info("Account sync end!")
+
+    return
 
 if __name__ == "__main__":
-    main()
+    # Create and configure logger
+    logging.basicConfig(filename="logfile.log", format='%(asctime)s %(levelname)s - %(message)s', filemode='a')
+    logger = logging.getLogger('maginkcal')
+    logger.addHandler(logging.StreamHandler(sys.stdout))  # print logger to stdout
+    logger.setLevel(logging.INFO)
+    logger.info("Starting daily calendar update")
+
+    displayTZ, thresholdHours, maxEventsPerDay, isDisplayToScreen, \
+    isShutdownOnComplete, batteryDisplayMode, weekStartDay, dayOfWeekText, \
+    screenWidth, screenHeight, imageWidth, imageHeight, rotateAngle, \
+    calendars, is24hour = config()
+
+    if isDisplayToScreen:
+    # initialize display
+        from display.display import DisplayHelper
+        displayService = DisplayHelper(screenWidth, screenHeight)
+    
+    sched = BlockingScheduler()
+    renderService = RenderHelper(imageWidth, imageHeight, rotateAngle)
+    gcalService = GcalHelper()
+
+    syncAccount(logger, gcalService)
+    syncCalendar(logger, gcalService)
+    displayCalendar(logger, displayService, renderService, gcalService)
+
+    sched.add_job(lambda: displayCalendar(logger, displayService, renderService, gcalService),
+        CronTrigger.from_crontab(
+            "0,15,30,45 * * * *"
+        ),
+        id='display'
+    )
+    sched.add_job(lambda: syncCalendar(logger, gcalService),
+        CronTrigger.from_crontab(
+            "10,25,40,55 * * * *"
+        ),
+        id="event_sync"
+    )
+    sched.add_job(lambda: syncAccount(logger, gcalService),
+        CronTrigger.from_crontab(
+            "0 0,12 * * *"
+        ),
+        id="account_sync"
+    )
+
+    try:
+        sched.start()
+    except (KeyboardInterrupt, SystemExit):
+        logger.info("Stop calendar services!")
+        displayService.epd.clear()
+        displayService.sleep()
+        logger.info("Stop calendar service complete!")
+        exit()
